@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.backends import default_backend
 
 from yubihsm import YubiHsm
-from yubihsm.defs import CAPABILITY, ALGORITHM
+from yubihsm.defs import CAPABILITY
 from yubihsm.objects import YhsmObject, AsymmetricKey
 
 # Connect to the YubiHSM via the connector using the default password:

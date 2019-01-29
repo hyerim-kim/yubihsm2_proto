@@ -1,4 +1,5 @@
 import hashlib
+import struct
 
 from asn1crypto import keys
 from cryptography import utils
@@ -7,8 +8,8 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from secp256k1 import PrivateKey, PublicKey, ffi
 from yubihsm import YubiHsm
-from yubihsm.defs import CAPABILITY, ALGORITHM
-from yubihsm.objects import AsymmetricKey, YhsmObject
+from yubihsm.defs import CAPABILITY, ALGORITHM, COMMAND
+from yubihsm.objects import AsymmetricKey
 
 # Connect to the YubiHSM via the connector using the default password:
 
@@ -48,9 +49,26 @@ key = AsymmetricKey.generate(  # Generate a new key object in the YubiHSM.
     ALGORITHM.EC_K256          # Algorithm for the key.
 )
 
+
+def sign_ecdsa(data, hash: hash = hashlib.sha3_256()):
+    """Sign data using ECDSA.
+
+    :param bytes data: The data to sign.
+    :param hash: (optional) The algorithm to use when hashing the data.
+    :return: The resulting signature.
+    :rtype: bytes
+    """
+    hash.update(data)
+    data = hash.digest()
+    length = hash.digest_size
+
+    msg = struct.pack('!H%ds' % length, key.id, data.rjust(length, b'\0'))
+    return session.send_secure_cmd(COMMAND.SIGN_ECDSA, msg)
+
+
 # Sign some data:
 print("******************************************\n\n")
-signature = key.sign_ecdsa(origin_data)  # Create a signature.
+signature = sign_ecdsa(origin_data, hashlib.sha3_256())  # Create a signature.
 print("\n===================================================")
 print(f"signature: {signature}")
 print("===================================================")

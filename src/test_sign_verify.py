@@ -4,6 +4,7 @@ from asn1crypto import keys
 from cryptography import utils
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurveSignatureAlgorithm
 from secp256k1 import PrivateKey, PublicKey, ffi
 from yubihsm import YubiHsm
 from yubihsm.defs import CAPABILITY, ALGORITHM
@@ -101,6 +102,7 @@ for i in range(4):
 
 else:
     print(f"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    _public_key.verifier(signature, origin_data, ec.ECDSA(hashes))
     print(f"signature is verified by ORIGINE pub ? : {is_verified_by_origin}")
     print(f"signature is verified by RECOVERED pub ? : {is_verified_by_recovered}")
     print(f"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
